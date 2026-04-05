@@ -3,199 +3,163 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chat with Alex - Manifestation Guru</title>
+    <title>Chat with Alex | Manifestation Expert</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
-        /* Custom animation for the typing dots */
-        .dot {
-            animation: blink 1.4s infinite both;
-            height: 6px;
-            width: 6px;
-            background-color: #6B7280;
-            border-radius: 50%;
-            display: inline-block;
-            margin: 0 2px;
-        }
+        body { font-family: 'Inter', sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+        
+        /* Smooth Scrollbar */
+        #chat-box::-webkit-scrollbar { width: 5px; }
+        #chat-box::-webkit-scrollbar-track { background: transparent; }
+        #chat-box::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+
+        /* Modern Message Bubbles */
+        .bubble-bot { border-radius: 2px 18px 18px 18px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .bubble-user { border-radius: 18px 18px 2px 18px; box-shadow: 0 4px 10px rgba(79, 70, 229, 0.3); }
+
+        /* Typing Dots Animation */
+        .dot { animation: blink 1.4s infinite both; height: 6px; width: 6px; background-color: #94a3b8; border-radius: 50%; display: inline-block; margin: 0 2px; }
         .dot:nth-child(1) { animation-delay: 0.2s; }
         .dot:nth-child(2) { animation-delay: 0.4s; }
         .dot:nth-child(3) { animation-delay: 0.6s; }
-        @keyframes blink {
-            0% { opacity: 0.2; transform: scale(0.8); }
-            20% { opacity: 1; transform: scale(1.2); }
-            100% { opacity: 0.2; transform: scale(0.8); }
-        }
+        @keyframes blink { 0%, 100% { opacity: 0.3; transform: scale(0.8); } 50% { opacity: 1; transform: scale(1.1); } }
+        
+        .fade-in { animation: fadeIn 0.4s ease-out forwards; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
-<body class="bg-gray-100 flex justify-center items-center h-screen p-4">
+<body class="flex justify-center items-center h-screen p-4">
 
-    <div class="w-full max-w-md bg-white rounded-lg shadow-xl flex flex-col h-[600px] border border-gray-200">
+    <div class="w-full max-w-md bg-white/95 backdrop-blur-md rounded-[2rem] shadow-2xl flex flex-col h-[650px] overflow-hidden border border-white/20">
         
-        <div class="bg-indigo-700 text-white p-4 rounded-t-lg flex items-center gap-3">
-            <img src="https://ui-avatars.com/api/?name=Alex&background=E0E7FF&color=3730A3&size=100" alt="Alex Profile" class="w-12 h-12 rounded-full border-2 border-indigo-300 object-cover">
-            <div>
-                <h2 class="text-xl font-bold flex items-center gap-2">
-                    Alex 
-                    <span class="w-2.5 h-2.5 bg-green-400 rounded-full" title="Online"></span>
-                </h2>
-                <p class="text-sm text-indigo-200">Manifestation Guru</p>
+        <div class="bg-indigo-600 p-6 flex items-center justify-between shadow-lg">
+            <div class="flex items-center gap-4">
+                <div class="relative">
+                    <img src="https://via.placeholder.com/150" id="profile-img" class="w-14 h-14 rounded-full border-2 border-white/30 object-cover shadow-md">
+                    <span class="absolute bottom-0 right-0 w-4 h-4 bg-green-400 border-2 border-indigo-600 rounded-full"></span>
+                </div>
+                <div>
+                    <h2 class="text-white font-semibold text-lg leading-tight">Alex</h2>
+                    <p class="text-indigo-100 text-xs font-medium uppercase tracking-wider">Manifestation Guru</p>
+                </div>
+            </div>
+            <div class="text-indigo-200">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
+                </svg>
             </div>
         </div>
 
-        <div id="chat-box" class="flex-1 p-4 overflow-y-auto flex flex-col gap-3">
+        <div id="chat-box" class="flex-1 p-6 overflow-y-auto flex flex-col gap-4 bg-[#f8fafc]">
             </div>
 
-        <div class="p-4 border-t flex gap-2 bg-gray-50 rounded-b-lg">
-            <input type="text" id="user-input" disabled class="flex-1 border rounded-lg p-3 focus:outline-none focus:border-indigo-600 disabled:bg-gray-200 disabled:cursor-not-allowed transition-colors" placeholder="Wait for Alex..." onkeypress="handleEnter(event)">
-            <button id="send-btn" disabled onclick="sendMessage()" class="bg-indigo-600 text-white px-5 py-2 rounded-lg hover:bg-indigo-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors font-medium">Send</button>
+        <div class="p-4 bg-white border-t border-gray-100 flex items-center gap-3">
+            <input type="text" id="user-input" disabled 
+                class="flex-1 bg-gray-50 border-0 rounded-2xl p-4 text-sm focus:ring-2 focus:ring-indigo-500 transition-all outline-none disabled:opacity-50" 
+                placeholder="Connecting to Alex...">
+            <button id="send-btn" disabled onclick="sendMessage()" 
+                class="bg-indigo-600 text-white p-4 rounded-2xl shadow-lg hover:bg-indigo-700 transition-all active:scale-95 disabled:grayscale">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 rotate-90" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                </svg>
+            </button>
         </div>
     </div>
 
     <script>
-        // ---------------------------------------------------------
-        // 🛠️ AFFILIATE DATA & KEYWORDS
-        // ---------------------------------------------------------
-        const productDatabase = [
-            {
-                keywords: ["money", "wealth", "rich", "finance", "business"],
-                reply: "The universe is ready to send abundance your way. I have a specific frequency video that unlocks wealth manifestation. Let me show you...",
-                videoRedirectUrl: "https://your-affiliate-link.com/wealth-video"
-            },
-            {
-                keywords: ["love", "soulmate", "ex", "relationship"],
-                reply: "Love is the highest vibration. To draw your soulmate to you, you need to align your energy. Watch this presentation I put together for you...",
-                videoRedirectUrl: "https://your-affiliate-link.com/love-video"
-            }
-        ];
+        // --- DATA CONFIGURATION ---
+        const config = {
+            botName: "Alex",
+            specialty: "Manifestation Guru",
+            products: [
+                { keywords: ["wealth", "money", "rich"], url: "LINK_HERE" },
+                { keywords: ["love", "soulmate"], url: "LINK_HERE" }
+            ],
+            defaultRedirect: "MAIN_LINK_HERE"
+        };
 
-        const defaultReply = "I sense strong energy from you. No matter what you desire, the first step is rewiring your subconscious. I want you to watch this special video right now...";
-        const defaultVideoUrl = "https://your-affiliate-link.com/main-manifestation-video";
-
-        // ---------------------------------------------------------
-        // ⚙️ CHATBOT LOGIC & ANIMATIONS
-        // ---------------------------------------------------------
         const chatBox = document.getElementById("chat-box");
         const userInput = document.getElementById("user-input");
         const sendBtn = document.getElementById("send-btn");
 
-        // Start the intro sequence when the page loads
         window.onload = () => {
-            runIntroSequence();
+            setTimeout(startSequence, 800);
         };
 
-        function runIntroSequence() {
-            // 1. Show System Message
-            addSystemMessage("Searching for available online support...");
-
-            // 2. Show Typing Indicator after 1.5 seconds
+        function startSequence() {
+            addSystemMsg("Searching for online support...");
             setTimeout(() => {
                 showTyping();
-
-                // 3. Remove typing and show Alex's message after another 2 seconds
                 setTimeout(() => {
                     hideTyping();
-                    addSystemMessage("Connected with Alex.");
-                    addMessage("Hi! Myself Alex, manifestation guru.", true);
+                    addSystemMsg("Connected with Alex.");
+                    addMsg(`Hi! I am ${config.botName}, your ${config.specialty}.`, true);
                     
-                    // 4. Follow up message
                     setTimeout(() => {
                         showTyping();
                         setTimeout(() => {
                             hideTyping();
-                            addMessage("What are you trying to manifest in your life right now? (Wealth, Love, Health...)", true);
-                            enableInput();
-                        }, 1500);
+                            addMsg("Tell me, what are you looking to manifest in your life right now?", true);
+                            unlockInput();
+                        }, 1800);
                     }, 1000);
-
                 }, 2000);
             }, 1500);
         }
 
-        function enableInput() {
-            userInput.disabled = false;
-            sendBtn.disabled = false;
-            userInput.placeholder = "Type your answer here...";
-            userInput.focus();
-        }
-
-        function disableInput() {
-            userInput.disabled = true;
-            sendBtn.disabled = true;
-        }
-
-        function handleEnter(event) {
-            if (event.key === "Enter" && !userInput.disabled) sendMessage();
-        }
-
-        function addSystemMessage(text) {
+        function addMsg(text, isBot) {
             const div = document.createElement("div");
-            div.className = "text-center text-xs text-gray-400 my-1 font-semibold italic";
+            div.className = `max-w-[85%] p-4 text-sm fade-in ${isBot ? 'bg-white text-gray-700 bubble-bot self-start border border-gray-100' : 'bg-indigo-600 text-white bubble-user self-end'}`;
             div.innerText = text;
             chatBox.appendChild(div);
             chatBox.scrollTop = chatBox.scrollHeight;
         }
 
-        function addMessage(text, isBot) {
+        function addSystemMsg(text) {
             const div = document.createElement("div");
-            // Bot messages are gray, User messages are Indigo
-            div.className = `p-3 rounded-lg max-w-[85%] text-sm md:text-base shadow-sm ${isBot ? 'bg-white text-gray-800 self-start border border-gray-100' : 'bg-indigo-600 text-white self-end'}`;
+            div.className = "text-center text-[10px] uppercase tracking-widest text-slate-400 my-2 font-bold";
             div.innerText = text;
             chatBox.appendChild(div);
-            chatBox.scrollTop = chatBox.scrollHeight;
         }
 
         function showTyping() {
             const div = document.createElement("div");
-            div.id = "typing-indicator";
-            div.className = "p-3 rounded-lg max-w-[85%] bg-white border border-gray-100 self-start shadow-sm flex items-center";
-            div.innerHTML = `<div class="dot"></div><div class="dot"></div><div class="dot"></div>`;
+            div.id = "typing";
+            div.className = "bubble-bot bg-white p-4 self-start flex gap-1 shadow-sm border border-gray-100";
+            div.innerHTML = '<div class="dot"></div><div class="dot"></div><div class="dot"></div>';
             chatBox.appendChild(div);
             chatBox.scrollTop = chatBox.scrollHeight;
         }
 
-        function hideTyping() {
-            const typing = document.getElementById("typing-indicator");
-            if (typing) typing.remove();
+        function hideTyping() { document.getElementById("typing")?.remove(); }
+
+        function unlockInput() {
+            userInput.disabled = false; sendBtn.disabled = false;
+            userInput.placeholder = "Type your desire..."; userInput.focus();
         }
 
         function sendMessage() {
-            const text = userInput.value.trim().toLowerCase();
-            if (!text) return;
-
-            // Show User Message & disable input so they can't spam
-            addMessage(userInput.value, false);
+            const val = userInput.value.trim();
+            if(!val) return;
+            addMsg(val, false);
             userInput.value = "";
-            disableInput();
+            userInput.disabled = true;
 
-            // Find a matching product based on keywords
-            let foundProduct = null;
-            for (let product of productDatabase) {
-                if (product.keywords.some(keyword => text.includes(keyword))) {
-                    foundProduct = product;
-                    break;
-                }
-            }
-
-            // Simulate Alex typing out his response
             setTimeout(() => {
                 showTyping();
-                
                 setTimeout(() => {
                     hideTyping();
-                    
-                    if (foundProduct) {
-                        addMessage(foundProduct.reply, true);
-                        setTimeout(() => {
-                            window.location.href = foundProduct.videoRedirectUrl;
-                        }, 3000);
-                    } else {
-                        addMessage(defaultReply, true);
-                        setTimeout(() => {
-                            window.location.href = defaultVideoUrl;
-                        }, 3000);
-                    }
-                }, 2000); // 2 seconds of typing
-            }, 500); // Wait half a second before starting to type
+                    addMsg("I understand. I have prepared a special frequency video just for this. Redirecting you to watch it now...", true);
+                    setTimeout(() => {
+                        window.location.href = config.defaultRedirect;
+                    }, 3000);
+                }, 2500);
+            }, 800);
         }
+
+        function handleEnter(e) { if(e.key === "Enter") sendMessage(); }
+        userInput.addEventListener("keypress", handleEnter);
     </script>
 </body>
 </html>
