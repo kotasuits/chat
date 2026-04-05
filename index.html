@@ -6,69 +6,68 @@
     <title>Messenger | Alex</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        body { background-color: #f0f2f5; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+        body { background-color: #f0f2f5; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; height: 100vh; display: flex; justify-content: center; align-items: center; margin: 0; }
         
-        /* Messenger Blue */
+        /* Spacing for mobile */
+        @media (max-width: 768px) {
+            body { padding: 10px; }
+            .chat-window { height: 90vh; }
+        }
+
+        /* Messenger Styling */
         .messenger-blue { color: #0084FF; }
         .messenger-bg-blue { background-color: #0084FF; }
 
-        /* Chat Bubbles */
-        .bubble { max-width: 72%; padding: 10px 14px; font-size: 15px; line-height: 1.4; border-radius: 18px; }
+        .bubble { max-width: 75%; padding: 10px 14px; font-size: 15px; line-height: 1.4; border-radius: 18px; }
         .bubble-bot { background-color: #e4e6eb; color: #050505; border-bottom-left-radius: 4px; }
-        .bubble-user { background-color: #0084ff; color: white; border-bottom-right-radius: 4px; }
+        .bubble-user { background-color: #0084ff; color: white; border-bottom-right-radius: 4px; align-self: flex-end; }
 
-        /* Typing Dots Animation */
         .typing-dot { width: 6px; height: 6px; background: #90949c; border-radius: 50%; display: inline-block; animation: msg-typing 1.2s infinite ease-in-out; }
         .typing-dot:nth-child(2) { animation-delay: 0.2s; }
         .typing-dot:nth-child(3) { animation-delay: 0.4s; }
         @keyframes msg-typing { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-4px); } }
 
-        #chat-box::-webkit-scrollbar { width: 4px; }
+        #chat-box::-webkit-scrollbar { width: 5px; }
         #chat-box::-webkit-scrollbar-thumb { background: #bcc0c4; border-radius: 10px; }
         
         .fade-in { animation: fadeIn 0.3s ease-out forwards; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Emoji Picker Styling */
+        #emoji-picker { display: none; position: absolute; bottom: 80px; left: 20px; background: white; border: 1px solid #ccc; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); width: 250px; height: 200px; overflow-y: scroll; padding: 10px; grid-template-columns: repeat(6, 1fr); gap: 5px; z-index: 100; }
+        #emoji-picker.show { display: grid; }
+        .emoji-item { cursor: pointer; font-size: 1.5rem; text-align: center; }
     </style>
 </head>
-<body class="flex justify-center items-center h-screen">
+<body class="bg-gray-100">
 
-    <div class="w-full max-w-[480px] bg-white h-screen md:h-[750px] flex flex-col md:rounded-2xl shadow-2xl border border-gray-200 overflow-hidden">
+    <div class="chat-window w-full max-w-[450px] bg-white h-screen md:h-[700px] flex flex-col md:rounded-2xl shadow-2xl border border-gray-200 overflow-hidden relative">
         
-        <div class="px-4 py-3 border-b flex items-center justify-between shadow-sm">
-            <div class="flex items-center gap-3">
-                <div class="relative">
-                    <img src="images/Gemini_Generated_Image_p8q4glp8q4glp8q4.png" id="alex-photo" class="w-10 h-10 rounded-full object-cover border border-gray-100">
-                    <span class="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-white rounded-full"></span>
-                </div>
-                <div>
-                    <h2 class="font-bold text-[16px] leading-tight text-gray-900">Alex</h2>
-                    <p class="text-[12px] text-gray-500">Active now</p>
-                </div>
+        <div class="px-4 py-3 border-b flex items-center gap-3 shadow-sm">
+            <div class="relative">
+                <img src="images/Gemini_Generated_Image_p8q4glp8q4glp8q4.png" id="alex-photo" class="w-10 h-10 rounded-full object-cover border-2 border-white ring-2 ring-white ring-offset-2 ring-offset-green-500">
+                <span class="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-white rounded-full"></span>
             </div>
-            <div class="flex gap-5 messenger-blue">
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M6.62 10.79a15.1 15.1 0 006.59 6.59l2.2-2.2a1 1 0 011.11-.27 11.72 11.72 0 003.7.59 1 1 0 011 1V20a1 1 0 01-1 1A15 15 0 013 6a1 1 0 011-1h3.5a1 1 0 011 1 11.72 11.72 0 00.59 3.7 1 1 0 01-.27 1.11l-2.2 2.2z"/></svg>
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M17 10.5V7a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h12a1 1 0 001-1v-3.5l4 4v-11l-4 4z"/></svg>
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+            <div>
+                <h2 class="font-bold text-[16px] leading-tight text-gray-900">Alex</h2>
+                <p class="text-[12px] text-gray-500">Active Now</p>
             </div>
         </div>
 
         <div id="chat-box" class="flex-1 p-4 overflow-y-auto flex flex-col gap-3 bg-white">
-            <div class="flex flex-col items-center py-8">
-                <img src="images/Gemini_Generated_Image_p8q4glp8q4glp8q4.png" class="w-20 h-20 rounded-full object-cover mb-2 border">
-                <h3 class="font-bold text-lg">Alex</h3>
-                <p class="text-gray-500 text-sm">Manifestation Guru • Expert Advisor</p>
-                <p class="text-gray-400 text-xs mt-1">You're connected on Messenger</p>
             </div>
-        </div>
 
-        <div class="p-3 bg-white flex items-center gap-2">
-            <div class="flex gap-2 messenger-blue px-2">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm5 11h-4v4h-2v-4H7v-2h4V7h2v4h4v2z"/></svg>
+        <div id="emoji-picker">
+            </div>
+
+        <div class="p-3 bg-white flex items-center gap-2 border-t">
+            <div class="flex gap-2 messenger-blue px-2 cursor-pointer" onclick="toggleEmojiPicker()">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zM9.5 8.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm5 0a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm.5 8.16l-.28-.31c-.13-.15-.31-.24-.51-.24-.46 0-.81.33-.81.76 0 .09.02.19.06.27l1.01 2.02a.5.5 0 0 1-.45.72H9.98c-.28 0-.46-.3-.33-.52l1.01-2.02c.04-.08.06-.18.06-.27 0-.43-.35-.76-.81-.76-.2 0-.38.09-.51.24l-.28.31C8.29 16.92 7 16 7 14.5A2.5 2.5 0 0 1 9.5 12c.57 0 1.11.19 1.56.54.44-.35.99-.54 1.56-.54A2.5 2.5 0 0 1 15 14.5c0 1.5-1.29 2.42-2.14 2.66z"/></svg>
             </div>
             <div class="flex-1 bg-[#f0f2f5] rounded-full px-4 py-2 border border-transparent focus-within:border-gray-200">
                 <input type="text" id="user-input" disabled 
                     class="w-full bg-transparent border-none outline-none text-[15px] placeholder-gray-500" 
-                    placeholder="Wait for Alex...">
+                    placeholder="Connecting...">
             </div>
             <button id="send-btn" disabled onclick="sendMessage()" class="messenger-blue font-bold text-[15px] px-2 disabled:opacity-30">
                 Send
@@ -78,19 +77,23 @@
 
     <script>
         const config = {
-            affiliateVideo: "YOUR_SALES_VIDEO_LINK_HERE", // Replace with your link
+            affiliateVideo: "YOUR_SALES_VIDEO_LINK_HERE", // Change to your link
             alexImg: "images/Gemini_Generated_Image_p8q4glp8q4glp8q4.png"
         };
 
         const chatBox = document.getElementById("chat-box");
         const userInput = document.getElementById("user-input");
         const sendBtn = document.getElementById("send-btn");
+        const emojiPicker = document.getElementById("emoji-picker");
+
+        const emojis = ['👍', '🙌', '😄', '✨', '💖', '💸', '🧘', '🌟', '🙏', '❤️', '😊', '😍', '🤔', '🎉', '🔥', '💪', '💡', '🚀'];
 
         window.onload = () => {
             setTimeout(() => {
                 addSystemMsg("Searching for online support...");
                 setTimeout(startSequence, 1500);
             }, 500);
+            populateEmojiPicker();
         };
 
         function startSequence() {
@@ -103,7 +106,7 @@
                     showTyping();
                     setTimeout(() => {
                         hideTyping();
-                        addBotMsg("I've helped thousands align with their abundance. What is your heart seeking today?");
+                        addBotMsg("I see you're ready to align with your highest path. What desire do you want to manifest most right now? 🤔");
                         unlockInput();
                     }, 1800);
                 }, 1000);
@@ -112,7 +115,7 @@
 
         function addBotMsg(text) {
             const wrap = document.createElement("div");
-            wrap.className = "flex items-end gap-2 fade-in mb-1";
+            wrap.className = "flex items-start gap-2 fade-in mb-1";
             wrap.innerHTML = `
                 <img src="${config.alexImg}" class="w-7 h-7 rounded-full object-cover">
                 <div class="bubble bubble-bot">${text}</div>
@@ -166,17 +169,18 @@
             addUserMsg(val);
             userInput.value = "";
             userInput.disabled = true;
+            emojiPicker.classList.remove('show'); // Close picker if open
 
             setTimeout(() => {
                 showTyping();
                 setTimeout(() => {
                     hideTyping();
-                    addBotMsg("The universe has a plan for you. I have prepared a specific frequency video for your situation.");
+                    addBotMsg("The universe responds to your intention.");
                     setTimeout(() => {
                         showTyping();
                         setTimeout(() => {
                             hideTyping();
-                            addBotMsg("Redirecting you to the sacred presentation now. Please watch carefully.");
+                            addBotMsg("I've prepared a specific frequency video that unlocks the gate to that desire. Watch carefully.");
                             setTimeout(() => {
                                 window.location.href = config.affiliateVideo;
                             }, 3000);
@@ -184,6 +188,27 @@
                     }, 800);
                 }, 2500);
             }, 800);
+        }
+
+        // Emoji Picker Logic
+        function populateEmojiPicker() {
+            emojis.forEach(emoji => {
+                const span = document.createElement('span');
+                span.className = 'emoji-item';
+                span.innerText = emoji;
+                span.onclick = () => insertEmoji(emoji);
+                emojiPicker.appendChild(span);
+            });
+        }
+
+        function toggleEmojiPicker() {
+            emojiPicker.classList.toggle('show');
+        }
+
+        function insertEmoji(emoji) {
+            userInput.value += emoji;
+            emojiPicker.classList.remove('show');
+            userInput.focus();
         }
 
         userInput.addEventListener("keypress", (e) => { if(e.key === "Enter") sendMessage(); });
