@@ -3,76 +3,170 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Smart Product Advisor</title>
+    <title>Chat with Alex - Manifestation Guru</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom animation for the typing dots */
+        .dot {
+            animation: blink 1.4s infinite both;
+            height: 6px;
+            width: 6px;
+            background-color: #6B7280;
+            border-radius: 50%;
+            display: inline-block;
+            margin: 0 2px;
+        }
+        .dot:nth-child(1) { animation-delay: 0.2s; }
+        .dot:nth-child(2) { animation-delay: 0.4s; }
+        .dot:nth-child(3) { animation-delay: 0.6s; }
+        @keyframes blink {
+            0% { opacity: 0.2; transform: scale(0.8); }
+            20% { opacity: 1; transform: scale(1.2); }
+            100% { opacity: 0.2; transform: scale(0.8); }
+        }
+    </style>
 </head>
-<body class="bg-gray-100 flex justify-center items-center h-screen">
+<body class="bg-gray-100 flex justify-center items-center h-screen p-4">
 
-    <div class="w-full max-w-md bg-white rounded-lg shadow-xl flex flex-col h-[600px]">
-        <div class="bg-blue-600 text-white p-4 rounded-t-lg">
-            <h2 class="text-xl font-bold">💬 Product Advisor</h2>
-            <p class="text-sm">Ask me what you're looking for!</p>
-        </div>
-
-        <div id="chat-box" class="flex-1 p-4 overflow-y-auto flex flex-col gap-3">
-            <div class="bg-gray-200 text-gray-800 p-3 rounded-lg max-w-[80%] self-start">
-                Hi! What kind of solution are you looking for today? (e.g., "weight loss", "make money", "software")
+    <div class="w-full max-w-md bg-white rounded-lg shadow-xl flex flex-col h-[600px] border border-gray-200">
+        
+        <div class="bg-indigo-700 text-white p-4 rounded-t-lg flex items-center gap-3">
+            <img src="https://ui-avatars.com/api/?name=Alex&background=E0E7FF&color=3730A3&size=100" alt="Alex Profile" class="w-12 h-12 rounded-full border-2 border-indigo-300 object-cover">
+            <div>
+                <h2 class="text-xl font-bold flex items-center gap-2">
+                    Alex 
+                    <span class="w-2.5 h-2.5 bg-green-400 rounded-full" title="Online"></span>
+                </h2>
+                <p class="text-sm text-indigo-200">Manifestation Guru</p>
             </div>
         </div>
 
-        <div class="p-4 border-t flex gap-2">
-            <input type="text" id="user-input" class="flex-1 border rounded-lg p-2 focus:outline-none focus:border-blue-600" placeholder="Type here..." onkeypress="handleEnter(event)">
-            <button onclick="sendMessage()" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">Send</button>
+        <div id="chat-box" class="flex-1 p-4 overflow-y-auto flex flex-col gap-3">
+            </div>
+
+        <div class="p-4 border-t flex gap-2 bg-gray-50 rounded-b-lg">
+            <input type="text" id="user-input" disabled class="flex-1 border rounded-lg p-3 focus:outline-none focus:border-indigo-600 disabled:bg-gray-200 disabled:cursor-not-allowed transition-colors" placeholder="Wait for Alex..." onkeypress="handleEnter(event)">
+            <button id="send-btn" disabled onclick="sendMessage()" class="bg-indigo-600 text-white px-5 py-2 rounded-lg hover:bg-indigo-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors font-medium">Send</button>
         </div>
     </div>
 
     <script>
         // ---------------------------------------------------------
-        // 🛠️ YOUR AFFILIATE & VIDEO DATA GOES HERE
+        // 🛠️ AFFILIATE DATA & KEYWORDS
         // ---------------------------------------------------------
         const productDatabase = [
             {
-                keywords: ["weight", "diet", "fitness", "lose"],
-                reply: "I know exactly what can help you with your fitness goals! I'm redirecting you to a free presentation now...",
-                videoRedirectUrl: "https://your-affiliate-link.com/sales-video-1"
+                keywords: ["money", "wealth", "rich", "finance", "business"],
+                reply: "The universe is ready to send abundance your way. I have a specific frequency video that unlocks wealth manifestation. Let me show you...",
+                videoRedirectUrl: "https://your-affiliate-link.com/wealth-video"
             },
             {
-                keywords: ["money", "business", "income", "earn"],
-                reply: "Great! Let me show you a proven system for generating income online. Redirecting to the video...",
-                videoRedirectUrl: "https://your-affiliate-link.com/sales-video-2"
+                keywords: ["love", "soulmate", "ex", "relationship"],
+                reply: "Love is the highest vibration. To draw your soulmate to you, you need to align your energy. Watch this presentation I put together for you...",
+                videoRedirectUrl: "https://your-affiliate-link.com/love-video"
             }
         ];
 
-        // Fallback message if they type something unexpected
-        const defaultReply = "I don't have a specific product for that, but tell me more about what you want to achieve!";
+        const defaultReply = "I sense strong energy from you. No matter what you desire, the first step is rewiring your subconscious. I want you to watch this special video right now...";
+        const defaultVideoUrl = "https://your-affiliate-link.com/main-manifestation-video";
 
         // ---------------------------------------------------------
-        // ⚙️ CHATBOT LOGIC (Do not edit below unless you know JS)
+        // ⚙️ CHATBOT LOGIC & ANIMATIONS
         // ---------------------------------------------------------
         const chatBox = document.getElementById("chat-box");
         const userInput = document.getElementById("user-input");
+        const sendBtn = document.getElementById("send-btn");
+
+        // Start the intro sequence when the page loads
+        window.onload = () => {
+            runIntroSequence();
+        };
+
+        function runIntroSequence() {
+            // 1. Show System Message
+            addSystemMessage("Searching for available online support...");
+
+            // 2. Show Typing Indicator after 1.5 seconds
+            setTimeout(() => {
+                showTyping();
+
+                // 3. Remove typing and show Alex's message after another 2 seconds
+                setTimeout(() => {
+                    hideTyping();
+                    addSystemMessage("Connected with Alex.");
+                    addMessage("Hi! Myself Alex, manifestation guru.", true);
+                    
+                    // 4. Follow up message
+                    setTimeout(() => {
+                        showTyping();
+                        setTimeout(() => {
+                            hideTyping();
+                            addMessage("What are you trying to manifest in your life right now? (Wealth, Love, Health...)", true);
+                            enableInput();
+                        }, 1500);
+                    }, 1000);
+
+                }, 2000);
+            }, 1500);
+        }
+
+        function enableInput() {
+            userInput.disabled = false;
+            sendBtn.disabled = false;
+            userInput.placeholder = "Type your answer here...";
+            userInput.focus();
+        }
+
+        function disableInput() {
+            userInput.disabled = true;
+            sendBtn.disabled = true;
+        }
 
         function handleEnter(event) {
-            if (event.key === "Enter") sendMessage();
+            if (event.key === "Enter" && !userInput.disabled) sendMessage();
+        }
+
+        function addSystemMessage(text) {
+            const div = document.createElement("div");
+            div.className = "text-center text-xs text-gray-400 my-1 font-semibold italic";
+            div.innerText = text;
+            chatBox.appendChild(div);
+            chatBox.scrollTop = chatBox.scrollHeight;
         }
 
         function addMessage(text, isBot) {
             const div = document.createElement("div");
-            div.className = `p-3 rounded-lg max-w-[80%] ${isBot ? 'bg-gray-200 text-gray-800 self-start' : 'bg-blue-600 text-white self-end'}`;
+            // Bot messages are gray, User messages are Indigo
+            div.className = `p-3 rounded-lg max-w-[85%] text-sm md:text-base shadow-sm ${isBot ? 'bg-white text-gray-800 self-start border border-gray-100' : 'bg-indigo-600 text-white self-end'}`;
             div.innerText = text;
             chatBox.appendChild(div);
-            chatBox.scrollTop = chatBox.scrollHeight; // Auto-scroll to bottom
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+
+        function showTyping() {
+            const div = document.createElement("div");
+            div.id = "typing-indicator";
+            div.className = "p-3 rounded-lg max-w-[85%] bg-white border border-gray-100 self-start shadow-sm flex items-center";
+            div.innerHTML = `<div class="dot"></div><div class="dot"></div><div class="dot"></div>`;
+            chatBox.appendChild(div);
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+
+        function hideTyping() {
+            const typing = document.getElementById("typing-indicator");
+            if (typing) typing.remove();
         }
 
         function sendMessage() {
             const text = userInput.value.trim().toLowerCase();
             if (!text) return;
 
-            // 1. Show User Message
+            // Show User Message & disable input so they can't spam
             addMessage(userInput.value, false);
             userInput.value = "";
+            disableInput();
 
-            // 2. Find a matching product
+            // Find a matching product based on keywords
             let foundProduct = null;
             for (let product of productDatabase) {
                 if (product.keywords.some(keyword => text.includes(keyword))) {
@@ -81,20 +175,26 @@
                 }
             }
 
-            // 3. Bot Replies and Redirects (Simulating a slight delay)
+            // Simulate Alex typing out his response
             setTimeout(() => {
-                if (foundProduct) {
-                    addMessage(foundProduct.reply, true);
+                showTyping();
+                
+                setTimeout(() => {
+                    hideTyping();
                     
-                    // Trigger the redirect to the sales video after 2.5 seconds
-                    setTimeout(() => {
-                        window.location.href = foundProduct.videoRedirectUrl;
-                    }, 2500);
-
-                } else {
-                    addMessage(defaultReply, true);
-                }
-            }, 600);
+                    if (foundProduct) {
+                        addMessage(foundProduct.reply, true);
+                        setTimeout(() => {
+                            window.location.href = foundProduct.videoRedirectUrl;
+                        }, 3000);
+                    } else {
+                        addMessage(defaultReply, true);
+                        setTimeout(() => {
+                            window.location.href = defaultVideoUrl;
+                        }, 3000);
+                    }
+                }, 2000); // 2 seconds of typing
+            }, 500); // Wait half a second before starting to type
         }
     </script>
 </body>
