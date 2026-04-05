@@ -6,59 +6,65 @@
     <title>Messenger | Alex</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        body { background-color: #f0f2f5; font-family: sans-serif; }
-        .bubble { max-width: 80%; padding: 8px 12px; border-radius: 18px; font-size: 15px; }
-        .bot { background: #e4e6eb; color: black; border-bottom-left-radius: 4px; }
+        body { background-color: #f0f2f5; font-family: -apple-system, sans-serif; margin: 0; display: flex; justify-content: center; align-items: center; height: 100vh; }
+        .bubble { max-width: 80%; padding: 10px 14px; border-radius: 18px; font-size: 15px; line-height: 1.4; position: relative; }
+        .bot { background: #e4e6eb; color: black; border-bottom-left-radius: 4px; align-self: flex-start; }
         .user { background: #0084ff; color: white; border-bottom-right-radius: 4px; align-self: flex-end; }
         
-        /* Typing Animation */
+        /* Typing Dots */
         .dot { width: 6px; height: 6px; background: #90949c; border-radius: 50%; display: inline-block; animation: wave 1.2s infinite; }
         .dot:nth-child(2) { animation-delay: 0.2s; }
         .dot:nth-child(3) { animation-delay: 0.4s; }
         @keyframes wave { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
-        
+
         #emoji-box { display: none; }
-        #emoji-box.open { display: grid; }
+        #emoji-box.open { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; }
     </style>
 </head>
-<body class="flex justify-center items-center h-screen">
+<body>
 
-    <div class="w-full max-w-[400px] bg-white h-screen md:h-[600px] flex flex-col md:rounded-xl shadow-lg overflow-hidden relative">
+    <div class="w-full max-w-[420px] bg-white h-screen md:h-[650px] flex flex-col md:rounded-2xl shadow-2xl overflow-hidden relative border border-gray-200">
         
-        <div class="p-3 border-b flex items-center gap-3 shadow-sm">
+        <div class="p-3 border-b flex items-center gap-3 bg-white sticky top-0 z-10">
             <div class="relative">
-                <img src="alex.png" class="w-10 h-10 rounded-full object-cover border">
+                <img src="images/Gemini_Generated_Image_p8q4glp8q4glp8q4.png" 
+                     onerror="this.src='https://ui-avatars.com/api/?name=Alex&background=0084ff&color=fff'" 
+                     class="w-10 h-10 rounded-full object-cover border border-gray-100">
                 <div class="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-white rounded-full"></div>
             </div>
-            <div class="flex-1">
-                <p class="font-bold text-sm">Alex</p>
-                <p class="text-[11px] text-green-500 font-medium">Active now</p>
+            <div>
+                <p class="font-bold text-[15px] text-gray-900">Alex</p>
+                <p class="text-[11px] text-gray-500 font-medium">Active now</p>
             </div>
         </div>
 
-        <div id="chat" class="flex-1 p-4 overflow-y-auto flex flex-col gap-2 bg-white">
-            <div class="text-center text-[10px] text-gray-400 my-4 uppercase tracking-widest">Connected</div>
+        <div id="chat" class="flex-1 p-4 overflow-y-auto flex flex-col gap-3 bg-white">
+            <div class="text-center text-[11px] text-gray-400 my-4 uppercase tracking-tighter font-bold">Today</div>
         </div>
 
-        <div id="emoji-box" class="absolute bottom-16 left-4 bg-white border shadow-xl p-2 grid-cols-5 gap-2 rounded-lg z-50">
-            <span onclick="addEmoji('✨')" class="cursor-pointer p-1 text-xl">✨</span>
-            <span onclick="addEmoji('🙏')" class="cursor-pointer p-1 text-xl">🙏</span>
-            <span onclick="addEmoji('💰')" class="cursor-pointer p-1 text-xl">💰</span>
-            <span onclick="addEmoji('🔥')" class="cursor-pointer p-1 text-xl">🔥</span>
-            <span onclick="addEmoji('🙌')" class="cursor-pointer p-1 text-xl">🙌</span>
+        <div id="emoji-box" class="absolute bottom-20 left-4 bg-white border border-gray-200 shadow-2xl p-3 rounded-2xl z-50">
+            <span onclick="addEmoji('✨')" class="cursor-pointer text-2xl hover:scale-120 transition">✨</span>
+            <span onclick="addEmoji('🙏')" class="cursor-pointer text-2xl hover:scale-120 transition">🙏</span>
+            <span onclick="addEmoji('💰')" class="cursor-pointer text-2xl hover:scale-120 transition">💰</span>
+            <span onclick="addEmoji('🔥')" class="cursor-pointer text-2xl hover:scale-120 transition">🔥</span>
+            <span onclick="addEmoji('🙌')" class="cursor-pointer text-2xl hover:scale-120 transition">🙌</span>
         </div>
 
-        <div class="p-3 border-t flex items-center gap-2">
-            <button onclick="document.getElementById('emoji-box').classList.toggle('open')" class="text-blue-500">
-                <svg width="24" height="24" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-5-9h10v2H7z"/></svg>
+        <div class="p-3 bg-white border-t flex items-center gap-2">
+            <button onclick="document.getElementById('emoji-box').classList.toggle('open')" class="text-blue-500 p-1">
+                <svg width="26" height="26" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-5-9h10v2H7z"/></svg>
             </button>
-            <input type="text" id="msg" disabled class="flex-1 bg-gray-100 rounded-full px-4 py-2 text-sm outline-none" placeholder="Wait for Alex...">
-            <button id="btn" disabled onclick="send()" class="text-blue-600 font-bold px-2">Send</button>
+            <div class="flex-1 bg-gray-100 rounded-full px-4 py-2">
+                <input type="text" id="msg" disabled class="w-full bg-transparent outline-none text-[15px] placeholder-gray-500" placeholder="Connecting...">
+            </div>
+            <button id="btn" disabled onclick="send()" class="text-blue-600 font-bold px-2 disabled:opacity-30">Send</button>
         </div>
     </div>
 
     <script>
-        const videoURL = "YOUR_LINK_HERE"; // Put your affiliate link here
+        // CHANGE THIS TO YOUR VIDEO LINK
+        const AFFILIATE_LINK = "https://your-affiliate-link.com"; 
+
         const chat = document.getElementById('chat');
         const input = document.getElementById('msg');
         const btn = document.getElementById('btn');
@@ -68,14 +74,14 @@
                 showTyping();
                 setTimeout(() => {
                     hideTyping();
-                    addMsg("Hi! Myself Alex, manifestation guru.", true);
+                    addMsg("Hi! Myself Alex, manifestation guru. ✨", true);
                     setTimeout(() => {
                         showTyping();
                         setTimeout(() => {
                             hideTyping();
-                            addMsg("What would you like to manifest today? ✨", true);
+                            addMsg("What would you like to manifest in your life right now?", true);
                             input.disabled = false; btn.disabled = false;
-                            input.placeholder = "Type here...";
+                            input.placeholder = "Type your answer...";
                         }, 1500);
                     }, 1000);
                 }, 2000);
@@ -93,7 +99,7 @@
         function showTyping() {
             const div = document.createElement('div');
             div.id = 'typing';
-            div.className = 'bubble bot flex gap-1 items-center h-8 w-16';
+            div.className = 'bubble bot flex gap-1 items-center h-9 w-16';
             div.innerHTML = '<div class="dot"></div><div class="dot"></div><div class="dot"></div>';
             chat.appendChild(div);
             chat.scrollTop = chat.scrollHeight;
@@ -104,6 +110,7 @@
         function addEmoji(e) { 
             input.value += e; 
             document.getElementById('emoji-box').classList.remove('open');
+            input.focus();
         }
 
         function send() {
@@ -117,8 +124,8 @@
                 showTyping();
                 setTimeout(() => {
                     hideTyping();
-                    addMsg("I have a powerful secret for you. I'm taking you to a video that explains everything. Watch it now...", true);
-                    setTimeout(() => { window.location.href = videoURL; }, 3000);
+                    addMsg("That is beautiful. I've prepared a special frequency video to manifest exactly that. Watch it now.", true);
+                    setTimeout(() => { window.location.href = AFFILIATE_LINK; }, 3000);
                 }, 2500);
             }, 1000);
         }
