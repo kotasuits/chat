@@ -1,0 +1,910 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Messenger | Alex</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            background: #e8eaf6;
+            background: linear-gradient(135deg, #e8eaf6 0%, #f0f2f5 50%, #e3f2fd 100%);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        /* App Container Layout */
+        .app-container {
+            width: 100%;
+            max-width: 420px;
+            background: #ffffff;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        }
+        @media (min-width: 768px) {
+            .app-container {
+                height: 680px;
+                border-radius: 20px;
+                border: 1px solid #e4e6eb;
+                overflow: hidden;
+            }
+        }
+
+        /* Header */
+        .header {
+            padding: 12px 16px;
+            border-bottom: 1px solid #e4e6eb;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            z-index: 10;
+        }
+        .header-avatar-container {
+            position: relative;
+            width: 40px;
+            height: 40px;
+            flex-shrink: 0;
+        }
+        .header-avatar {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 1px solid #f0f2f5;
+        }
+        .status-dot {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: 12px;
+            height: 12px;
+            background: #31a24c;
+            border: 2px solid #ffffff;
+            border-radius: 50%;
+        }
+        .header-info {
+            flex: 1;
+        }
+        .header-name {
+            font-weight: 600;
+            font-size: 16px;
+            color: #050505;
+            margin: 0 0 2px 0;
+        }
+        .header-status {
+            font-size: 12px;
+            color: #65676b;
+            margin: 0;
+        }
+        .header-icon {
+            color: #0084ff;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: transparent;
+            transition: background 0.2s;
+            border: none;
+        }
+        .header-icon:hover {
+            background: #f0f2f5;
+        }
+
+        /* Chat area */
+        .chat-area {
+            flex: 1;
+            padding: 16px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            background: #ffffff;
+        }
+        .time-divider {
+            text-align: center;
+            font-size: 12px;
+            color: #65676B;
+            margin: 12px 0;
+            font-weight: 500;
+        }
+        
+        /* Chat Starter Layout */
+        .chat-starter {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 40px 20px 20px;
+            text-align: center;
+        }
+        .chat-starter-avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-bottom: 12px;
+        }
+        .chat-starter-name {
+            font-size: 22px;
+            font-weight: 600;
+            color: #050505;
+            margin: 0 0 6px 0;
+        }
+        .chat-starter-meta {
+            font-size: 14px;
+            color: #65676B;
+            margin: 0;
+            line-height: 1.4;
+        }
+
+        /* Message Rows */
+        .msg-row {
+            display: flex;
+            align-items: flex-end;
+            margin-bottom: 2px;
+            max-width: 100%;
+        }
+        .msg-row.bot-row {
+            justify-content: flex-start;
+        }
+        .msg-row.user-row {
+            justify-content: flex-end;
+        }
+
+        /* Msg Avatar */
+        .msg-avatar {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-right: 8px;
+            flex-shrink: 0;
+            opacity: 0; /* managed by JS for grouping */
+            transition: opacity 0.2s;
+        }
+        .msg-avatar.visible {
+            opacity: 1;
+        }
+
+        /* Chat bubbles */
+        .bubble-wrapper {
+            display: flex;
+            flex-direction: column;
+            max-width: 70%;
+        }
+        
+        .bubble {
+            padding: 10px 14px;
+            font-size: 15px;
+            line-height: 1.4;
+            position: relative;
+            word-wrap: break-word;
+            animation: pop-in 0.25s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+            opacity: 0;
+            transform: scale(0.95) translateY(4px);
+            transform-origin: bottom left;
+        }
+        @keyframes pop-in {
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        
+        /* Bot Bubble styling */
+        .bot-row .bubble {
+            background: #e4e6eb;
+            color: #050505;
+            border-radius: 18px;
+        }
+        .bot-row.grouped-bot-top .bubble { border-bottom-left-radius: 4px; }
+        .bot-row.grouped-bot-middle .bubble { border-top-left-radius: 4px; border-bottom-left-radius: 4px; }
+        .bot-row.grouped-bot-bottom .bubble { border-top-left-radius: 4px; }
+
+        /* User Bubble styling */
+        .user-row .bubble {
+            background: #0084ff;
+            color: white;
+            border-radius: 18px;
+            transform-origin: bottom right;
+        }
+        .user-row.grouped-user-top .bubble { border-bottom-right-radius: 4px; }
+        .user-row.grouped-user-middle .bubble { border-top-right-radius: 4px; border-bottom-right-radius: 4px; }
+        .user-row.grouped-user-bottom .bubble { border-top-right-radius: 4px; }
+
+        /* Link bubble */
+        .link-bubble {
+            background: linear-gradient(135deg, #0084ff, #0061c2);
+            color: white;
+            border-radius: 16px;
+            padding: 12px 16px;
+            max-width: 100%;
+            text-decoration: none;
+            display: block;
+            box-shadow: 0 4px 12px rgba(0, 132, 255, 0.25);
+            transition: filter 0.2s;
+        }
+        .link-bubble:hover { filter: brightness(1.1); }
+        .link-bubble .link-title { font-weight: 600; font-size: 15px; margin-bottom: 4px; }
+        .link-bubble .link-sub   { font-size: 13px; opacity: 0.9; }
+
+        /* Quick reply buttons */
+        .qr-wrap { display: flex; flex-wrap: wrap; gap: 8px; justify-content: flex-end; margin-top: 6px; margin-bottom: 10px; width: 100%; }
+        .qr-btn {
+            padding: 8px 16px;
+            border-radius: 20px;
+            border: 1px solid #0084ff;
+            color: #0084ff;
+            background: #ffffff;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            animation: pop-in 0.25s ease forwards;
+            opacity: 0;
+            transform: scale(0.95);
+        }
+        .qr-btn:hover { background: #f0f8ff; }
+        .qr-btn:active { background: #0084ff; color: white; transform: scale(0.98); }
+
+        /* Typing dots */
+        .typing-indicator { display: flex; gap: 4px; align-items: center; padding: 12px 16px; height: 16px; box-sizing: content-box;}
+        .dot { width: 6px; height: 6px; background: #8d949e; border-radius: 50%; display: inline-block; animation: wave 1.4s infinite; opacity: 0.6; }
+        .dot:nth-child(2) { animation-delay: 0.2s; }
+        .dot:nth-child(3) { animation-delay: 0.4s; }
+        @keyframes wave { 0%, 100% { transform: translateY(0); opacity: 0.6;} 50% { transform: translateY(-4px); opacity: 1;} }
+
+        /* Emoji picker */
+        #emoji-box { 
+            position: absolute;
+            bottom: 74px;
+            left: 12px;
+            background: white;
+            border: 1px solid #e4e6eb;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            padding: 12px;
+            border-radius: 20px;
+            z-index: 50;
+            display: none;
+            transform-origin: bottom left;
+            animation: pop-in 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        #emoji-box.open { display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px; }
+        .emoji-item {
+            font-size: 24px;
+            cursor: pointer;
+            text-align: center;
+            transition: transform 0.15s;
+            user-select: none;
+        }
+        .emoji-item:hover { transform: scale(1.25); }
+
+        /* Scrollbar */
+        .chat-area::-webkit-scrollbar { width: 5px; }
+        .chat-area::-webkit-scrollbar-track { background: transparent; }
+        .chat-area::-webkit-scrollbar-thumb { background: #ccd0d5; border-radius: 10px; }
+
+        /* Input Area */
+        .input-area {
+            padding: 12px;
+            border-top: 1px solid #e4e6eb;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: #ffffff;
+            z-index: 10;
+        }
+        .input-wrap {
+            flex: 1;
+            background: #f0f2f5;
+            border-radius: 20px;
+            padding: 8px 16px;
+            display: flex;
+            align-items: center;
+            transition: box-shadow 0.2s;
+        }
+        .input-wrap.focused {
+            box-shadow: 0 0 0 2px rgba(0, 132, 255, 0.2);
+        }
+        .msg-input {
+            width: 100%;
+            background: transparent;
+            border: none;
+            outline: none;
+            font-size: 15px;
+            color: #050505;
+        }
+        .msg-input::placeholder { color: #8c939d; }
+        .msg-input:disabled { background: transparent; }
+        
+        .icon-btn {
+            color: #0084ff;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            padding: 6px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s;
+        }
+        .icon-btn:hover { background: #f0f2f5; }
+        .icon-btn:disabled { color: #bcc0c4; cursor: default; background: transparent; }
+
+        /* Pulse animation for input ready */
+        @keyframes pulse-ring { 0%, 100% { box-shadow: 0 0 0 0 rgba(0,132,255,0); } 50% { box-shadow: 0 0 0 4px rgba(0,132,255,0.15); } }
+        .input-ready { animation: pulse-ring 1.5s ease 2; }
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+        
+        <!-- Header -->
+        <div class="header">
+            <div class="header-avatar-container">
+                <img src="alex.png"
+                     onerror="this.src='https://ui-avatars.com/api/?name=Alex&background=e4e6eb&color=000&bold=true'"
+                     alt="Alex"
+                     class="header-avatar">
+                <div class="status-dot"></div>
+            </div>
+            <div class="header-info">
+                <p class="header-name">Alex</p>
+                <p class="header-status">Active now</p>
+            </div>
+            <button class="header-icon">
+                <svg width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/>
+                </svg>
+            </button>
+        </div>
+
+        <!-- Chat area -->
+        <div id="chat" class="chat-area">
+            <div class="chat-starter">
+                <img src="alex.png" onerror="this.src='https://ui-avatars.com/api/?name=Alex&background=e4e6eb&color=000&bold=true'" alt="Alex" class="chat-starter-avatar">
+                <p class="chat-starter-name">Alex</p>
+                <p class="chat-starter-meta">Messenger<br>You're connected on Messenger</p>
+            </div>
+            <div class="time-divider">Today</div>
+        </div>
+
+        <!-- Emoji picker -->
+        <div id="emoji-box">
+            <span class="emoji-item" onclick="addEmoji('✨')">✨</span>
+            <span class="emoji-item" onclick="addEmoji('🙏')">🙏</span>
+            <span class="emoji-item" onclick="addEmoji('💰')">💰</span>
+            <span class="emoji-item" onclick="addEmoji('🔥')">🔥</span>
+            <span class="emoji-item" onclick="addEmoji('🙌')">🙌</span>
+            <span class="emoji-item" onclick="addEmoji('💫')">💫</span>
+            <span class="emoji-item" onclick="addEmoji('❤️')">❤️</span>
+            <span class="emoji-item" onclick="addEmoji('😊')">😊</span>
+            <span class="emoji-item" onclick="addEmoji('🌟')">🌟</span>
+            <span class="emoji-item" onclick="addEmoji('💎')">💎</span>
+            <span class="emoji-item" onclick="addEmoji('🧿')">🧿</span>
+            <span class="emoji-item" onclick="addEmoji('🫶')">🫶</span>
+        </div>
+
+        <!-- Input bar -->
+        <div class="input-area">
+            <button id="emoji-btn" class="icon-btn" onclick="document.getElementById('emoji-box').classList.toggle('open')">
+                <svg width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm3.5-9c.83 0 1.5-.67 1.5-1.5S16.33 8 15.5 8 14 8.67 14 9.5s.67 1.5 1.5 1.5zm-7 0c.83 0 1.5-.67 1.5-1.5S9.33 8 8.5 8 7 8.67 7 9.5 7.67 11 8.5 11zm3.5 6.5c2.33 0 4.31-1.46 5.11-3.5H6.89c.8 2.04 2.78 3.5 5.11 3.5z"/>
+                </svg>
+            </button>
+            
+            <div class="input-wrap" id="input-wrap">
+                <input
+                    type="text"
+                    id="msg"
+                    class="msg-input"
+                    disabled
+                    placeholder="Connecting..."
+                    onfocus="document.getElementById('input-wrap').classList.add('focused')"
+                    onblur="document.getElementById('input-wrap').classList.remove('focused')"
+                    onkeydown="if(event.key==='Enter' && !this.disabled) send()">
+            </div>
+
+            <button id="btn" class="icon-btn" disabled onclick="send()">
+                <svg width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+                </svg>
+            </button>
+        </div>
+    </div>
+
+    <script>
+        const LINKS = {
+            numerology: "https://eb4db7-mu-stgblj5hkey70f89.hop.clickbank.net",
+            brain: "https://hop.clickbank.net/?affiliate=arshadwaji&vendor=brainsig",
+            manifestation: "https://hop.clickbank.net/?affiliate=arshadwaji&vendor=teslaws18&cbpage=vsl&tid="
+        };
+
+        const chat  = document.getElementById('chat');
+        const input = document.getElementById('msg');
+        const btn   = document.getElementById('btn');
+
+        let step = 0;
+        let lastSender = null; // To manage grouped bubble radius
+        let botAvatarPath = "alex.png";
+        
+        // Link logic state
+        let chosenLink = LINKS.manifestation;
+        let chosenContentType = "video"; // or "reading"
+
+        // ── State Persistence ──────────────────────────
+        
+        function saveState() {
+            const wasTyping = document.getElementById('typing');
+            if (wasTyping) return;
+            
+            localStorage.setItem('chat_html', chat.innerHTML);
+            localStorage.setItem('chat_step', step);
+            localStorage.setItem('chat_link', chosenLink);
+            localStorage.setItem('chat_type', chosenContentType);
+        }
+
+        function restoreState() {
+            const html = localStorage.getItem('chat_html');
+            if (!html) return false;
+            
+            chat.innerHTML = html;
+            step = parseInt(localStorage.getItem('chat_step')) || 1;
+            chosenLink = localStorage.getItem('chat_link') || LINKS.manifestation;
+            chosenContentType = localStorage.getItem('chat_type') || "video";
+            
+            chat.scrollTop = chat.scrollHeight;
+            if (step === 4) {
+                enableInput();
+            } else {
+                disableInput();
+            }
+            return true;
+        }
+
+        document.addEventListener('click', (e) => {
+            if (e.target.classList.contains('qr-btn')) {
+                const ans = e.target.textContent;
+                e.target.closest('.qr-wrap')?.remove();
+                addMsg(ans, false);
+                
+                if (step === 1) {
+                    if (ans.includes("Destiny")) {
+                        chosenLink = LINKS.numerology; chosenContentType = "reading";
+                    } else if (ans.includes("Brain")) {
+                        chosenLink = LINKS.brain; chosenContentType = "video";
+                    } else {
+                        chosenLink = LINKS.manifestation; chosenContentType = "video";
+                    }
+                    step = 2; step2();
+                } else if (step === 2) {
+                    step = 3; step3(ans);
+                } else if (step === 3) {
+                    step = 4; step4();
+                } else if (step === 5) {
+                    step = 6; step6();
+                } else if (step === 6) {
+                    step = 7; step7();
+                } else if (step === 7) {
+                    step = 8; step8();
+                } else if (step === 8) {
+                    step = 9; step9();
+                }
+            }
+        });
+
+        // ── Helpers ──────────────────────────────────
+
+        function updateAvatarVisibility() {
+            // Find all bot rows
+            const rows = chat.querySelectorAll('.msg-row');
+            if(rows.length === 0) return;
+            
+            // Re-evalute grouping and avatars
+            for(let i=0; i<rows.length; i++) {
+                const row = rows[i];
+                if(row.classList.contains('bot-row') || row.classList.contains('user-row')) {
+                    const isBot = row.classList.contains('bot-row');
+                    const nextRow = rows[i+1];
+                    const nextIsSame = nextRow && nextRow.classList.contains(isBot ? 'bot-row' : 'user-row');
+                    
+                    // Show avatar only on the LAST message of a bot group
+                    if(isBot) {
+                        const avatar = row.querySelector('.msg-avatar');
+                        if(avatar) {
+                            if(!nextIsSame) {
+                                avatar.classList.add('visible');
+                            } else {
+                                avatar.classList.remove('visible');
+                            }
+                        }
+                    }
+
+                    // Reset grouped classes
+                    row.classList.remove('grouped-bot-top','grouped-bot-middle','grouped-bot-bottom', 'grouped-user-top', 'grouped-user-middle', 'grouped-user-bottom');
+                    
+                    const prevRow = rows[i-1];
+                    const prevIsSame = prevRow && prevRow.classList.contains(isBot ? 'bot-row' : 'user-row');
+                    
+                    const pfx = isBot ? 'grouped-bot' : 'grouped-user';
+                    
+                    if(!prevIsSame && nextIsSame) {
+                        row.classList.add(`${pfx}-top`);
+                    } else if (prevIsSame && nextIsSame) {
+                        row.classList.add(`${pfx}-middle`);
+                    } else if (prevIsSame && !nextIsSame) {
+                        row.classList.add(`${pfx}-bottom`);
+                    }
+                }
+            }
+        }
+
+        function createMessageElement(contentHtml, isBot, isTyping = false) {
+            const row = document.createElement('div');
+            row.className = `msg-row ${isBot ? 'bot-row' : 'user-row'}`;
+            if(isTyping) row.id = 'typing';
+
+            if (isBot) {
+                // Add avatar image container
+                const img = document.createElement('img');
+                img.src = botAvatarPath;
+                img.className = 'msg-avatar';
+                img.onerror = () => { img.src = 'https://ui-avatars.com/api/?name=Alex&background=e4e6eb&color=000&bold=true'; };
+                row.appendChild(img);
+            }
+
+            const wrapper = document.createElement('div');
+            wrapper.className = 'bubble-wrapper';
+            
+            const bubble = document.createElement('div');
+            bubble.className = `bubble ${isTyping ? 'typing-indicator' : ''}`;
+            bubble.innerHTML = contentHtml;
+            
+            wrapper.appendChild(bubble);
+            row.appendChild(wrapper);
+            
+            return row;
+        }
+
+        function addMsg(text, isBot = true, delay = 0) {
+            return new Promise(resolve => {
+                setTimeout(() => {
+                    const row = createMessageElement(text, isBot);
+                    chat.appendChild(row);
+                    lastSender = isBot ? 'bot' : 'user';
+                    updateAvatarVisibility();
+                    chat.scrollTop = chat.scrollHeight;
+                    saveState();
+                    resolve();
+                }, delay);
+            });
+        }
+
+        function showTyping() {
+            const html = '<div class="dot"></div><div class="dot"></div><div class="dot"></div>';
+            const row = createMessageElement(html, true, true);
+            chat.appendChild(row);
+            updateAvatarVisibility();
+            chat.scrollTop = chat.scrollHeight;
+        }
+
+        function hideTyping() { 
+            document.getElementById('typing')?.remove(); 
+            updateAvatarVisibility();
+        }
+
+        function botReply(messages, typingMs = 1800) {
+            return new Promise(resolve => {
+                showTyping();
+                setTimeout(async () => {
+                    hideTyping();
+                    for (let i = 0; i < messages.length; i++) {
+                        await addMsg(messages[i], true, i * 600);
+                    }
+                    setTimeout(resolve, messages.length * 600 + 200);
+                }, typingMs);
+            });
+        }
+
+        function addQuickReplies(options) {
+            const wrap = document.createElement('div');
+            wrap.className = 'qr-wrap';
+            options.forEach((opt, i) => {
+                const b = document.createElement('button');
+                b.className = 'qr-btn';
+                b.style.animationDelay = `${i * 60}ms`;
+                b.textContent = opt;
+                wrap.appendChild(b);
+            });
+            chat.appendChild(wrap);
+            chat.scrollTop = chat.scrollHeight;
+            saveState();
+        }
+
+        function enableInput() {
+            input.disabled = false;
+            btn.disabled   = false;
+            input.placeholder = "Type your answer...";
+            document.getElementById('input-wrap').classList.add('input-ready');
+            setTimeout(() => document.getElementById('input-wrap').classList.remove('input-ready'), 3000);
+            input.focus();
+            saveState();
+        }
+
+        function disableInput() {
+            input.disabled = true;
+            btn.disabled   = true;
+            input.placeholder = "Wait...";
+        }
+
+        function addLinkBubble() {
+            const btnText = chosenContentType === "reading" 
+                ? "📖 Unlock Your Personal Reading →" 
+                : "🎬 Watch Your Frequency Video →";
+            const subTitle = chosenContentType === "reading"
+                ? "Specially decoded for your unique life path"
+                : "Specially tuned for your manifestation goal";
+
+            const html = `
+                <a href="${chosenLink}" target="_blank" rel="noopener noreferrer" class="link-bubble">
+                    <div class="link-title">${btnText}</div>
+                    <div class="link-sub">${subTitle}</div>
+                </a>
+            `;
+            const row = createMessageElement(html, true);
+            chat.appendChild(row);
+            updateAvatarVisibility();
+            chat.scrollTop = chat.scrollHeight;
+
+            setTimeout(() => { window.open(chosenLink, '_blank'); }, 3500);
+        }
+
+        // ── Conversation Flow ─────────────────────────
+
+        window.onload = () => {
+            if (restoreState()) return;
+
+            setTimeout(async () => {
+                await botReply(["Hi! I'm Alex, your manifestation guide. ✨"], 1500);
+                await botReply(["What is your primary goal right now?"], 1200);
+                disableInput(); // Force quick reply choice
+                step = 1;
+                addQuickReplies([
+                    "Manifest Wealth, Love or Health",
+                    "Discover My True Destiny",
+                    "Unlock My Brain's Potential"
+                ]);
+            }, 800);
+        };
+
+        async function step2() {
+            disableInput();
+            if (chosenLink === LINKS.numerology) {
+                await botReply([
+                    "Your life path is entirely unique. Have you ever felt like you're carrying a deeper purpose you haven't quite unlocked?"
+                ], 1800);
+                addQuickReplies(["Yes! Every day", "Sometimes", "I'm still searching"]);
+            } else if (chosenLink === LINKS.brain) {
+                await botReply([
+                    "Your mind is capable of incredible things. Do you often feel mental fog or like you're hitting a wall when learning?"
+                ], 1800);
+                addQuickReplies(["Yes, constantly", "Sometimes", "Only when tired"]);
+            } else {
+                await botReply([
+                    "That's so powerful — many people share this same desire. 🙏",
+                    "How long have you been trying to manifest this?"
+                ], 1800);
+                addQuickReplies(["Just starting", "A few months", "Years — nothing works"]);
+            }
+        }
+
+        async function step3(prevAnswer) {
+            if (chosenLink === LINKS.numerology) {
+                await botReply([
+                    "I sense that. Your birth date holds the exact coordinates to your soul's blueprint.",
+                    "Do you already know your core Life Path Number?"
+                ], 2200);
+                addQuickReplies(["Yes, I know it", "No, what is that?"]);
+            } else if (chosenLink === LINKS.brain) {
+                await botReply([
+                    "I understand completely. This isn't your fault — modern life blocks our deeper neuro-pathways.",
+                    "Are you truly ready to clear that fog?"
+                ], 2200);
+                addQuickReplies(["Yes entirely", "Show me how"]);
+            } else {
+                const msg = prevAnswer.includes("Years")
+                    ? "I understand completely... you've tried hard and you deserve results. 💎"
+                    : "That's okay... you're in the right place at exactly the right time. 🌟";
+
+                await botReply([msg, "Before we continue, I have to ask: Are you truly ready to let go of your past blockages?"], 2200);
+                addQuickReplies(["Yes, I am ready", "I'm not sure, but I want to be"]);
+            }
+        }
+
+        async function step4() {
+            if (chosenLink === LINKS.numerology) {
+                await botReply([
+                    "The numbers never lie.",
+                    "What is the biggest question you currently have about your future?"
+                ], 2400);
+            } else if (chosenLink === LINKS.brain) {
+                await botReply([
+                    "Your brain is ready for an upgrade.",
+                    "What is your biggest frustration with your focus or memory?"
+                ], 2400);
+            } else {
+                await botReply([
+                    "Your energy feels very open right now. I sense a shift waiting to happen. 💫",
+                    "What do you feel is the biggest fear or negative thought currently holding you back?"
+                ], 2400);
+            }
+            enableInput();
+        }
+
+        async function step5() {
+            disableInput();
+            if (chosenLink === LINKS.numerology) {
+                await botReply([
+                    "That makes perfect sense. Thank you for sharing.",
+                    "Have you been seeing repeating numbers lately, like 111 or 333?"
+                ], 2200);
+                addQuickReplies(["Yes, everywhere!", "Not really", "I haven't noticed"]);
+            } else if (chosenLink === LINKS.brain) {
+                await botReply([
+                    "Thank you for sharing that focus struggle.",
+                    "Have you ever had a moment of pure 'flow' where everything just clicked instantly?"
+                ], 2200);
+                addQuickReplies(["Yes! I want that back", "Rarely", "Never"]);
+            } else {
+                await botReply([
+                    "Thank you for sharing that. It takes real courage to be honest about our hurdles. ❤️",
+                    "Have you ever felt a sudden burst of intuition, a deep feeling that you're meant for much more?"
+                ], 2200);
+                addQuickReplies(["Yes, all the time!", "Sometimes", "Never"]);
+            }
+        }
+
+        async function step6() {
+            if (chosenLink === LINKS.numerology) {
+                await botReply([
+                    "That is the universe trying to align you! ✨",
+                    "If you could finally see your true path mapped out clearly, how would that feel?"
+                ], 2000);
+                addQuickReplies(["Peaceful 😌", "Empowering 🔥", "Relieved 🕊️", "Exciting!"]);
+            } else if (chosenLink === LINKS.brain) {
+                await botReply([
+                    "That flow state is actually your true baseline! ✨",
+                    "If you could tap into that genius state on command, how would you feel?"
+                ], 2000);
+                addQuickReplies(["Unstoppable 🔥", "Focused 🧠", "Relieved 🕊️", "Excited!"]);
+            } else {
+                await botReply([
+                    "That is your higher self trying to get your attention! ✨",
+                    "When you close your eyes and imagine finally having what you desire, how does it make you feel?"
+                ], 2000);
+                addQuickReplies(["Peaceful 😌", "Excited 🔥", "Relieved 🕊️", "Overwhelmed with joy 😭"]);
+            }
+        }
+
+        async function step7() {
+            if (chosenLink === LINKS.numerology) {
+                await botReply([
+                    "Hold onto that exact feeling. 🧿",
+                    "I'm going to calculate your cosmic alignment right now... just take a deep breath."
+                ], 1800);
+                await botReply([
+                    "I'm sensing a misalignment between your current path and your core destiny number. 💔",
+                    "Are you willing to realign this today?"
+                ], 3500); 
+            } else if (chosenLink === LINKS.brain) {
+                await botReply([
+                    "Hold onto that exact feeling. 🧿",
+                    "I'm going to analyze your frequency state right now... just take a deep breath."
+                ], 1800);
+                await botReply([
+                    "I'm seeing that your brain's Theta waves are currently being suppressed by stress. 📉",
+                    "Do you want to activate them naturally?"
+                ], 3500); 
+            } else {
+                await botReply([
+                    "Hold onto that exact feeling. That is the exact frequency you need to tune into. 🧿",
+                    "I'm going to scan your energy signature right now... just take a deep breath."
+                ], 1800);
+                await botReply([
+                    "I'm sensing a blockage in your energetic field, specifically holding onto old scarcity mindsets. 💔",
+                    "Are you willing to unblock this today?"
+                ], 3500); 
+            }
+
+            addQuickReplies(["Yes, absolutely", "Show me how"]);
+        }
+
+        async function step8() {
+            if (chosenLink === LINKS.numerology) {
+                await botReply([
+                    "The stars are aligning for you as we speak. 🌌",
+                    "I can generate a personalized numerology report that reveals your soul's hidden map...",
+                    "Would you be open to seeing it right now?"
+                ], 2400);
+            } else if (chosenLink === LINKS.brain) {
+                await botReply([
+                    "Your neural pathways are ready. 🌌",
+                    "I have a specific brainwave activation sound that switches on the 'genius' signal...",
+                    "Would you be open to trying it right now?"
+                ], 2400);
+            } else {
+                await botReply([
+                    "The universe is aligning things for you as we speak. 🌌",
+                    "I use a specific frequency tuning technique that I normally reserve for my private clients...",
+                    "Would you be open to trying it right now?"
+                ], 2400);
+            }
+
+            addQuickReplies(["Yes, please! 🙏", "I am ready"]);
+        }
+
+        async function step9() {
+            const desc = chosenContentType === "reading" 
+                ? "I've unlocked a deeply personal Numerology and Destiny report for you."
+                : "I've specially calibrated a frequency activation technique tuned exactly to your goal.";
+
+            await botReply([
+                "It isn't an accident that we crossed paths today. There are no coincidences. 🫶",
+                desc
+            ], 2500);
+            
+            setTimeout(async () => {
+                await step10();
+            }, 1000);
+        }
+
+        async function step10() {
+            const proof = chosenContentType === "reading"
+                ? "Thousands have used this exact reading to uncover their life's purpose and unlock abundance. 🔥"
+                : "Thousands of my students watched this exact video and unlocked their manifestation within 7 days. 🔥";
+
+            await botReply([
+                proof,
+                "This is your moment. Tap below to continue."
+            ], 2000);
+            
+            setTimeout(() => { addLinkBubble(); }, 800);
+        }
+
+        function send() {
+            const val = input.value.trim();
+            if (!val) return;
+            addMsg(val, false);
+            input.value = "";
+
+            if (step === 4) {
+                step = 5;
+                step5();
+            }
+        }
+
+        function addEmoji(e) {
+            input.value += e;
+            document.getElementById('emoji-box').classList.remove('open');
+            input.focus();
+        }
+
+        document.addEventListener('click', (e) => {
+            const box = document.getElementById('emoji-box');
+            const btn = document.getElementById('emoji-btn');
+            if (!box.contains(e.target) && !btn.contains(e.target)) {
+                box.classList.remove('open');
+            }
+        });
+    </script>
+</body>
+</html>
